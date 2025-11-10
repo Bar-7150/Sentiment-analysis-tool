@@ -6,29 +6,21 @@ import onnx
 from onnx import version_converter
 import cv2
 import torch
+from .config import VIT_MODEL_NAME, EMOTION_TABLE
 
 class Model:
-    #emotion table for Emotion-ferplus
-    emotion_table = {'neutral':0, 'happiness':1, 'surprise':2, 'sadness':3, 'anger':4, 'disgust':5, 'fear':6, 'contempt':7}
     
-    
-    VIT_MODEL_NAME = "trpakov/vit-face-expression"
-
-    extractor = AutoFeatureExtractor.from_pretrained(VIT_MODEL_NAME)
-    model = AutoModelForImageClassification.from_pretrained(VIT_MODEL_NAME)
     
     def __init__(self, model_path, model_option: int):
+        self.emotion_table=EMOTION_TABLE
         if (model_option not in (1,2)):
             raise ValueError(f"model option must be 1 or 2, got {model_option}")
         self.model_option = model_option
-        if (self.model_option == 2):
-            # To be used if model conversion is needed in future versions
-            # model = onnx.load(model_path)
-            # converted_model = version_converter.convert_version(model, 12)
-            # converted_path = model_path.replace("-8.onnx", "-12.onnx")
-            # onnx.save_model(converted_model, converted_path)
+        if (self.model_option==1):
+            self.extractor = AutoFeatureExtractor.from_pretrained(VIT_MODEL_NAME)
+            self.model = AutoModelForImageClassification.from_pretrained(VIT_MODEL_NAME)
             
-            # self.session = ort.InferenceSession(model_path)
+        if (self.model_option == 2):            
             self.face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
             )
@@ -51,14 +43,6 @@ class Model:
             return gray  
 
         x,y,w,h = max(faces, key=lambda r: r[2] * r[3])
-        
-        # Extra padding around detected face (not required for now)
-        # padding = int(0.2 * max(w, h))  # Increased from 10% to 20%
-        # x = max(0, x - padding)
-        # y = max(0, y - padding)
-        # w = min(gray.shape[1] - x, w + 2 * padding)
-        # h = min(gray.shape[0] - y, h + 2 * padding)
-        
         face = gray[y:y+h, x:x+w]
         
         return face
