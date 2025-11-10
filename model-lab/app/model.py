@@ -30,7 +30,9 @@ class Model:
             self.face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
             )
-            
+            if self.face_cascade.empty():
+                raise RuntimeError("Failed to load haarcascade_frontalface_default.xml")
+
             self.net=cv2.dnn.readNetFromONNX(model_path)
     
     def detect_face(self, pil_image):

@@ -55,5 +55,16 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 Response example:
 
 ```json
-{"emotion": "happy"}
+{
+  "emotion": "happy",
+  "probabilities": {
+    "angry": 0.05,
+    "disgust": 0.02,
+    "fear": 0.03,
+    "happy": 0.78,
+    "sad": 0.04,
+    "surprise": 0.06,
+    "neutral": 0.02
+  }
+}
 ```
